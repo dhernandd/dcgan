@@ -1,18 +1,8 @@
-# Copyright 2018 Daniel Hernandez Diaz, Columbia University
+# This code is a heavily modified version of Taehoon Kim's
 #
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
+# https://github.com/carpedm20/DCGAN-tensorflow
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-#
-# ==============================================================================
+# for my own exploratory purposes. Visit his github page for it is golden!
 from __future__ import print_function
 from __future__ import division
 
@@ -27,23 +17,40 @@ from code.dcgan import Generator
 class GeneratorTest(tf.test.TestCase):
     """
     """
-    height = 50
-    width = 50
+    output_height = 28
+    output_width = 28
     
-    xDim = 200
-    cDim = 3
-    graph = tf.Graph()
-    with graph.as_default():
-        X = tf.placeholder(tf.float32, [None, xDim], 'X')
-        gen = Generator(X, height, width, cDim=cDim)
+    yDim = 10
+    zDim = 200
+    batch_size = 64
+    num_data_channels = 1
+    graph1 = tf.Graph()
+    with graph1.as_default():
+        Z = tf.placeholder(tf.float32, [None, zDim], 'Z')
+        gen = Generator(Z, output_height, output_width, num_data_channels=num_data_channels,
+                        batch_size=batch_size)
+    
+    graph2 = tf.Graph()
+    with graph2.as_default():
+        Z = tf.placeholder(tf.float32, [None, zDim], 'Z')
+        Y = tf.placeholder(tf.float32, [batch_size, yDim], name='Y')
+        gen_withY = Generator(Z, output_height, output_width, Y=Y, num_data_channels=num_data_channels,
+                        batch_size=batch_size)
     
     def test_gen_nn(self):
         """
         """
-        with tf.Session(graph=self.graph) as sess:
-            sampleX = np.random.randn(1, self.xDim)
+#         with tf.Session(graph=self.graph1) as sess:
+#             sampleZ = np.random.randn(1, self.zDim)
+#             sess.run(tf.global_variables_initializer())
+#             out = sess.run(self.gen.gen_output, feed_dict={'Z:0' : sampleX})
+#             print(out.shape)
+        with tf.Session(graph=self.graph2) as sess:
+            sampleZ = np.random.randn(self.batch_size, self.zDim)
+            sampleY = np.random.randn(self.batch_size, self.yDim)
             sess.run(tf.global_variables_initializer())
-            out = sess.run(self.gen.gen_output, feed_dict={'X:0' : sampleX})
+            out = sess.run(self.gen_withY.gen_output, feed_dict={'Z:0' : sampleZ,
+                                                                 'Y:0' : sampleY})
             print(out.shape)
             
         

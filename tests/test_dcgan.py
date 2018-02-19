@@ -27,12 +27,14 @@ from code.dcgan import DCGAN
 class DCGANTest(tf.test.TestCase):
     """
     """
-    height = 50
-    width = 50
+    # MNIST properties
+    height = 28
+    yDim = 10
+    width = 28
     
-    xDim = 200
-    cDim = 3
-    dcgan = DCGAN(gen_xDim=xDim, output_height=height, output_width=width)
+    zDim = 128
+    num_datachannels = 1
+    dcgan = DCGAN(zDim=zDim, data_height=height, data_width=width, yDim=10)
 
 
 if __name__ == '__main__':
